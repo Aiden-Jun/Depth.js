@@ -1,10 +1,11 @@
-// Helper variables and functions
-
 const colors = {
-    white: 0, black: 1
+    white: 0,
+    black: 1
 }
 
-function goc(color) { return 1 - color; }
+function goc(color) {
+    return 1 - color;
+}
 
 const ob = [];
 for (let i = 0; i < 120; i++) {
@@ -17,19 +18,153 @@ for (let i = 0; i < 120; i++) {
 
 const pieces = {
     e: 0,
-    wp: 1, wn: 2, wb: 3, wr: 4, wq: 5, wk: 6,
-    bp: 7, bn: 8, bb: 9, br: 10, bq: 11, bk: 12
+    wp: 1,
+    wn: 2,
+    wb: 3,
+    wr: 4,
+    wq: 5,
+    wk: 6,
+    bp: 7,
+    bn: 8,
+    bb: 9,
+    br: 10,
+    bq: 11,
+    bk: 12
 }
 
 const pvm = {
-    [pieces.wp]: 100, [pieces.wn]: 300, [pieces.wb]: 320, [pieces.wr]: 500, [pieces.wq]: 900,
-    [pieces.bp]: -100, [pieces.bn]: -300, [pieces.bb]: -320, [pieces.br]: -500, [pieces.bq]: -900
+    [pieces.wp]: 100,
+    [pieces.wn]: 300,
+    [pieces.wb]: 320,
+    [pieces.wr]: 500,
+    [pieces.wq]: 900,
+    [pieces.bp]: -100,
+    [pieces.bn]: -300,
+    [pieces.bb]: -320,
+    [pieces.br]: -500,
+    [pieces.bq]: -900
 }
 
-function gpc(piece) { return piece === pieces["e"] ? null : (piece <= 6 ? 0 : 1); }
+const pstWhite = {
+    p: [
+        0, 0, 0, 0, 0, 0, 0, 0,
+        5, 10, 10, -20, -20, 10, 10, 5,
+        5, -5, -10, 0, 0, -10, -5, 5,
+        0, 0, 0, 20, 20, 0, 0, 0,
+        5, 5, 10, 25, 25, 10, 5, 5,
+        10, 10, 20, 30, 30, 20, 10, 10,
+        50, 50, 50, 50, 50, 50, 50, 50,
+        0, 0, 0, 0, 0, 0, 0, 0
+    ],
+    n: [
+        -50, -40, -30, -30, -30, -30, -40, -50,
+        -40, -20, 0, 0, 0, 0, -20, -40,
+        -30, 0, 10, 15, 15, 10, 0, -30,
+        -30, 5, 15, 20, 20, 15, 5, -30,
+        -30, 0, 15, 20, 20, 15, 0, -30,
+        -30, 5, 10, 15, 15, 10, 5, -30,
+        -40, -20, 0, 5, 5, 0, -20, -40,
+        -50, -40, -30, -30, -30, -30, -40, -50
+    ],
+    b: [
+        -20, -10, -10, -10, -10, -10, -10, -20,
+        -10, 0, 0, 0, 0, 0, 0, -10,
+        -10, 0, 5, 10, 10, 5, 0, -10,
+        -10, 5, 5, 10, 10, 5, 5, -10,
+        -10, 0, 10, 10, 10, 10, 0, -10,
+        -10, 10, 10, 10, 10, 10, 10, -10,
+        -10, 5, 0, 0, 0, 0, 5, -10,
+        -20, -10, -10, -10, -10, -10, -10, -20
+    ],
+    r: [
+        0, 0, 0, 0, 0, 0, 0, 0,
+        5, 10, 10, 10, 10, 10, 10, 5,
+        -5, 0, 0, 0, 0, 0, 0, -5,
+        -5, 0, 0, 0, 0, 0, 0, -5,
+        -5, 0, 0, 0, 0, 0, 0, -5,
+        -5, 0, 0, 0, 0, 0, 0, -5,
+        -5, 0, 0, 0, 0, 0, 0, -5,
+        0, 0, 0, 5, 5, 0, 0, 0
+    ],
+    q: [
+        -20, -10, -10, -5, -5, -10, -10, -20,
+        -10, 0, 0, 0, 0, 0, 0, -10,
+        -10, 0, 5, 5, 5, 5, 0, -10,
+        -5, 0, 5, 5, 5, 5, 0, -5,
+        0, 0, 5, 5, 5, 5, 0, -5,
+        -10, 5, 5, 5, 5, 5, 0, -10,
+        -10, 0, 5, 0, 0, 0, 0, -10,
+        -20, -10, -10, -5, -5, -10, -10, -20
+    ],
+    k: [
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -30, -40, -40, -50, -50, -40, -40, -30,
+        -20, -30, -30, -40, -40, -30, -30, -20,
+        -10, -20, -20, -20, -20, -20, -20, -10,
+        20, 20, 0, 0, 0, 0, 20, 20,
+        20, 30, 10, 0, 0, 10, 30, 20
+    ]
+};
 
-const rank_map = {2:"a", 3:"b", 4:"c", 5:"d", 6:"e", 7:"f", 8:"g", 9:"h"};
-const file_map = {2:"8", 3:"7", 4:"6", 5:"5", 6:"4", 7:"3", 8:"2", 9:"1"};
+function flipPSTForBlack(pstWhite) {
+    const pstBlack = {};
+    for (const piece in pstWhite) {
+        const table = pstWhite[piece];
+        const flipped = new Array(64);
+        for (let i = 0; i < 64; i++) {
+            const r = Math.floor(i / 8);
+            const f = i % 8;
+            const mirror_i = (7 - r) * 8 + f;
+            flipped[mirror_i] = -table[i];
+        }
+        pstBlack[piece] = flipped;
+    }
+    return pstBlack;
+}
+
+const pstBlack = flipPSTForBlack(pstWhite);
+
+const pieceToPST = {
+    "1": "p",
+    "7": "p",
+    "2": "n",
+    "8": "n",
+    "3": "b",
+    "9": "b",
+    "4": "r",
+    "10": "r",
+    "5": "q",
+    "11": "q",
+    "6": "k",
+    "12": "k"
+};
+
+function gpc(piece) {
+    return piece === pieces["e"] ? null : (piece <= 6 ? 0 : 1);
+}
+
+const rank_map = {
+    2: "a",
+    3: "b",
+    4: "c",
+    5: "d",
+    6: "e",
+    7: "f",
+    8: "g",
+    9: "h"
+};
+const file_map = {
+    2: "8",
+    3: "7",
+    4: "6",
+    5: "5",
+    6: "4",
+    7: "3",
+    8: "2",
+    9: "1"
+};
 
 function idxPos(idx120) {
     return rank_map[parseInt(String(idx120)[1])] + file_map[parseInt(String(idx120)[0])]
@@ -47,7 +182,6 @@ function cutBoardArray(boardArray) {
         .map(i => boardArray[i]);
 }
 
-// Objects
 class Move {
     constructor(sp, dp, promo, isCapture) {
         this.sp = sp;
@@ -58,8 +192,14 @@ class Move {
 
     getUCI() {
         const promoMap = {
-            [pieces.wq]: "q", [pieces.wr]: "r", [pieces.wb]: "b", [pieces.wn]: "n",
-            [pieces.bq]: "q", [pieces.br]: "r", [pieces.bb]: "b", [pieces.bn]: "n"
+            [pieces.wq]: "q",
+            [pieces.wr]: "r",
+            [pieces.wb]: "b",
+            [pieces.wn]: "n",
+            [pieces.bq]: "q",
+            [pieces.br]: "r",
+            [pieces.bb]: "b",
+            [pieces.bn]: "n"
         };
         const promo = this.promo ? promoMap[this.promo] || "" : "";
         return idxPos(this.sp) + idxPos(this.dp) + promo;
@@ -85,7 +225,11 @@ function makeMove(board, move) {
     const boardArray = board.boardArray;
     const newBoardArray = boardArray.slice();
 
-    const { sp, dp, promo } = move;
+    const {
+        sp,
+        dp,
+        promo
+    } = move;
     const movingPiece = newBoardArray[sp];
     const movingColor = gpc(movingPiece);
 
@@ -105,10 +249,18 @@ function makeMove(board, move) {
         newBoardArray[rookSp] = pieces.e;
     }
 
-    const castlingRights = { ...board.castlingRights };
+    const castlingRights = {
+        ...board.castlingRights
+    };
 
-    if (movingPiece === pieces.wk) { castlingRights.wks = false; castlingRights.wqs = false; }
-    if (movingPiece === pieces.bk) { castlingRights.bks = false; castlingRights.bqs = false; }
+    if (movingPiece === pieces.wk) {
+        castlingRights.wks = false;
+        castlingRights.wqs = false;
+    }
+    if (movingPiece === pieces.bk) {
+        castlingRights.bks = false;
+        castlingRights.bqs = false;
+    }
 
     if (sp === 99) castlingRights.wks = false;
     if (sp === 92) castlingRights.wqs = false;
@@ -161,12 +313,27 @@ function defaultBoard() {
         boardArray[32 + file - 2] = pieces.bp;
     }
 
-    return new BoardState(boardArray, colors.white, { wks: true, wqs: true, bks: true, bqs: true }, null);
+    return new BoardState(boardArray, colors.white, {
+        wks: true,
+        wqs: true,
+        bks: true,
+        bqs: true
+    }, null);
 }
 
 const fenPieceMap = {
-    'P': pieces.wp, 'N': pieces.wn, 'B': pieces.wb, 'R': pieces.wr, 'Q': pieces.wq, 'K': pieces.wk,
-    'p': pieces.bp, 'n': pieces.bn, 'b': pieces.bb, 'r': pieces.br, 'q': pieces.bq, 'k': pieces.bk
+    'P': pieces.wp,
+    'N': pieces.wn,
+    'B': pieces.wb,
+    'R': pieces.wr,
+    'Q': pieces.wq,
+    'K': pieces.wk,
+    'p': pieces.bp,
+    'n': pieces.bn,
+    'b': pieces.bb,
+    'r': pieces.br,
+    'q': pieces.bq,
+    'k': pieces.bk
 };
 
 function fenStringToBoard(fen) {
@@ -195,7 +362,12 @@ function fenStringToBoard(fen) {
 
     const currentColor = turnPart === "w" ? colors["white"] : colors["black"];
 
-    const castlingRights = { wks: false, wqs: false, bks: false, bqs: false };
+    const castlingRights = {
+        wks: false,
+        wqs: false,
+        bks: false,
+        bqs: false
+    };
     if (castlingPart.includes("K")) castlingRights.wks = true;
     if (castlingPart.includes("Q")) castlingRights.wqs = true;
     if (castlingPart.includes("k")) castlingRights.bks = true;
@@ -211,7 +383,6 @@ function fenStringToBoard(fen) {
     return new BoardState(boardArray, currentColor, castlingRights, enPasT);
 }
 
-// Logics
 class Logics {
     pawnMoves(color, board, index, onlyCapture = false) {
         const moves = [];
@@ -287,9 +458,15 @@ class Logics {
         return moves;
     }
 
-    bishopMoves(c, b, i) { return this.slidingMoves(c, b, i, [-11, -9, 9, 11]); }
-    rookMoves(c, b, i)   { return this.slidingMoves(c, b, i, [-10, 10, -1, 1]); }
-    queenMoves(c, b, i)  { return [...this.bishopMoves(c, b, i), ...this.rookMoves(c, b, i)]; }
+    bishopMoves(c, b, i) {
+        return this.slidingMoves(c, b, i, [-11, -9, 9, 11]);
+    }
+    rookMoves(c, b, i) {
+        return this.slidingMoves(c, b, i, [-10, 10, -1, 1]);
+    }
+    queenMoves(c, b, i) {
+        return [...this.bishopMoves(c, b, i), ...this.rookMoves(c, b, i)];
+    }
 
     isIndexAttacked(index, board, attackerColor) {
         const A = board.boardArray;
@@ -327,11 +504,11 @@ class Logics {
         });
 
         for (const [side, squares, rookSq, targetSq] of [
-            [colors.white, [97, 98], 99, 98],
-            [colors.white, [95, 94, 93], 92, 94],
-            [colors.black, [27, 28], 29, 28],
-            [colors.black, [25, 24, 23], 22, 24]
-        ]) {
+                [colors.white, [97, 98], 99, 98],
+                [colors.white, [95, 94, 93], 92, 94],
+                [colors.black, [27, 28], 29, 28],
+                [colors.black, [25, 24, 23], 22, 24]
+            ]) {
             if (color === side && squares.every(s => A[s] === pieces.e) && [pieces.wr, pieces.br].includes(A[rookSq])) {
                 if (![index, ...squares].some(s => this.isIndexAttacked(s, board, goc(color)))) moves.push(new Move(index, targetSq, null, false));
             }
@@ -364,28 +541,32 @@ class Logics {
     }
 }
 
-// Evaluation
 class Evaluation {
     evalBoard(board) {
-    let evalScore = 0;
-    const board64 = cutBoardArray(board.boardArray);
+        let evalScore = 0;
+        const board64 = cutBoardArray(board.boardArray);
 
-    for (let sq64 = 0; sq64 < 64; sq64++) {
-        const piece = board64[sq64];
-        if (piece === pieces.e) continue;
+        for (let sq64 = 0; sq64 < 64; sq64++) {
+            const piece = board64[sq64];
+            if (piece === pieces.e) continue;
 
-        if (![pieces.wk, pieces.bk].includes(piece)) {
-            evalScore += pvm[piece];
+            if (![pieces.wk, pieces.bk].includes(piece)) {
+                evalScore += pvm[piece];
+            }
+
+            const pstKey = pieceToPST[piece];
+            if (pstKey) {
+                const pstTable = piece <= 6 ? pstWhite[pstKey] : pstBlack[pstKey];
+                evalScore += pstTable[sq64];
+            }
         }
-    }
 
-    return evalScore;
+        return evalScore;
     }
 }
 
-// Search
 class Search {
-    constructor () {
+    constructor() {
         this.logics = new Logics()
         this.evaluation = new Evaluation()
     }
@@ -393,8 +574,8 @@ class Search {
     isInCheck(board, color) {
         const kingSq = board.boardArray.findIndex(
             (p, i) =>
-                (color === colors.white && p === pieces.wk) ||
-                (color === colors.black && p === pieces.bk)
+            (color === colors.white && p === pieces.wk) ||
+            (color === colors.black && p === pieces.bk)
         );
         return this.logics.isIndexAttacked(kingSq, board, goc(color));
     }
@@ -406,11 +587,17 @@ class Search {
 
     minimax(board, depth, alpha, beta, maximizingPlayer) {
         if (depth === 0 || this.isCheckmate(board)) {
-            return { score: this.evaluation.evalBoard(board), move: null };
+            return {
+                score: this.evaluation.evalBoard(board),
+                move: null
+            };
         }
 
         const legalMoves = this.logics.legalMoves(board);
-        if (!legalMoves.length) return { score: this.evaluation.evalBoard(board), move: null };
+        if (!legalMoves.length) return {
+            score: this.evaluation.evalBoard(board),
+            move: null
+        };
 
         let bestMove = null;
 
@@ -418,7 +605,9 @@ class Search {
             let maxEval = -Infinity;
             for (const move of legalMoves) {
                 const newBoard = makeMove(board, move);
-                const { score } = this.minimax(newBoard, depth - 1, alpha, beta, false);
+                const {
+                    score
+                } = this.minimax(newBoard, depth - 1, alpha, beta, false);
 
                 if (this.showThought) {
                     console.log(`[Depth ${depth}] Trying ${move.getUCI()} -> Eval: ${score}`);
@@ -436,12 +625,17 @@ class Search {
                     break;
                 }
             }
-            return { score: maxEval, move: bestMove };
+            return {
+                score: maxEval,
+                move: bestMove
+            };
         } else {
             let minEval = Infinity;
             for (const move of legalMoves) {
                 const newBoard = makeMove(board, move);
-                const { score } = this.minimax(newBoard, depth - 1, alpha, beta, true);
+                const {
+                    score
+                } = this.minimax(newBoard, depth - 1, alpha, beta, true);
 
                 if (this.showThought) {
                     console.log(`[Depth ${depth}] Trying ${move.getUCI()} -> Eval: ${score}`);
@@ -459,21 +653,25 @@ class Search {
                     break;
                 }
             }
-            return { score: minEval, move: bestMove };
+            return {
+                score: minEval,
+                move: bestMove
+            };
         }
     }
 }
 
-// Engine
 class Engine {
-    constructor () {
+    constructor() {
         this.search = new Search()
     }
 
     searchBestMove(forColor, board, depth) {
         const maximizingPlayer = forColor === colors.white;
 
-        const { move: bestMove } = this.search.minimax(
+        const {
+            move: bestMove
+        } = this.search.minimax(
             board,
             depth,
             -Infinity,
