@@ -133,12 +133,15 @@ try {
 }
 
 function getBookMove(board) {
+    /*
     const fen = board.getFen();
     const moves = openingBook[fen];
     if (!moves || moves.length === 0) return null
 
     const moveUCI = moves[Math.floor(Math.random() * moves.length)];
     return uciToMove(moveUCI, board)
+    */
+   return null
 }
 
 const ob = []
@@ -804,8 +807,12 @@ class Engine {
     }
 }
 
-const engine = new Engine()
-const board = defaultBoard()
-const bestMove = engine.bestMove(colors.white, board)
-console.log(bestMove.getUCI())
-console.log(engine.analyze(board.getFen()))
+export {
+    colors,
+    defaultBoard,
+    Engine,
+    Logics,
+    Move,
+    makeMove,
+    goc
+};
