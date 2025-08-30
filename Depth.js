@@ -756,6 +756,7 @@ class Engine {
 }
 
 const engine = new Engine()
-const board = defaultBoard()
+const fen = "3K2B1/B1p5/1p1Q4/2P3PP/3R3p/1b1NP3/2k4P/8 w - - 0 1"
+const board = engine.translateFEN(fen)
 const bestMove = engine.bestMove(colors.white, board)
 console.log(bestMove.getUCI())
