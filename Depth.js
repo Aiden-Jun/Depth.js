@@ -327,3 +327,7 @@ class Engine {
     }
 }
 
+const engine = new Engine()
+const board = defaultBoard()
+const bestMove = engine.bestMove(colors.white, board)
+console.log(bestMove.getUCI())
